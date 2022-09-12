@@ -6,6 +6,7 @@ const {
     saveOrderBuyProducts2,
     updateStatusPembayaran,
     getAllPurchasedProductsAdmin,
+    saveOrderBuyProducts1,
 } = require('../Controller/PembayaranController');
 const { validateToken }  = require('../Middlewares/ValidateToken');
 const { uploadsBuktiPembayaran } = require('../Helpers/Multer');
@@ -14,6 +15,7 @@ const router = Router();
 
     
     router.post('/product/save-order-buy-product', validateToken, saveOrderBuyProducts);
+    router.post('/product/save-order-buy-product-1', validateToken, saveOrderBuyProducts1);
     router.post('/product/save-order-buy-product-2:uidOrder', [validateToken, uploadsBuktiPembayaran.single('BuktiPembayaranImage')], saveOrderBuyProducts2);
     router.get('/product/get-all-purchased-products-admin', validateToken, getAllPurchasedProductsAdmin);
     router.post('/product/get-all-purchased-products', validateToken, getAllPurchasedProducts);

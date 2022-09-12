@@ -270,6 +270,49 @@ const getAllKeranjang = async ( req, res = response ) => {
    
 }
 
+const getKeranjang = async ( req, res = response ) => {
+
+
+    const { token } = req.body;
+
+    try {
+
+        const conn = await connet();
+
+        // const orderbuy = await conn.query('SELECT * FROM orderBuy JOIN users on orderbuy.user_id = users.id WHERE user_id = ?' [ req.uidPerson ]);
+
+        // console.log(token);
+
+        // const keranjang = await conn.query('SELECT keranjang.* FROM keranjang JOIN users on keranjang.user_id = users.id WHERE users.token = ?' , [token]);
+
+
+        const keranjang = await conn.query('SELECT keranjang.* , keranjangdetails.* , products.nameProduct , products.picture FROM keranjang JOIN users on keranjang.user_id = users.id JOIN keranjangdetails on keranjang.uidKeranjang = keranjangdetails.keranjang_id JOIN products on products.uidProduct = keranjangdetails.product_id WHERE users.token = ?' , [token]);
+
+        await conn.end();
+
+        if(keranjang[0].length === 0 ){
+            res.json({
+                resp: false,
+                msg : 'Keranjang kosong',
+                amount : 0,
+                keranjang : []
+            });
+            
+        }else{
+            res.json({
+                resp: true,
+                msg : 'Get Puchased Products',
+                amount : keranjang[0][0].amount,
+                uidKeranjang : keranjang[0][0].uidKeranjang
+            });
+        }
+        
+    } catch (err) {
+        
+    }
+   
+}
+
 const getKeranjangDetails = async ( req, res = response ) => {
 
     try {
@@ -391,6 +434,7 @@ module.exports = {
     saveHistoryKeranjang,
     deleteHistoryKeranjang,
     getAllKeranjang,
+    getKeranjang,
     getKeranjangDetails, 
     changeItemKeranjang
 }

@@ -33,6 +33,55 @@ const saveOrderBuyProducts = async (req = request, res = response) => {
    }
 }
 
+const saveOrderBuyProducts1 = async (req = request, res = response) => {
+
+    try {
+        
+     const { receipt, amount, products  } = req.body;
+ 
+     const conn = await connet();
+
+     const keranjang = await conn.query('SELECT uidKeranjang FROM keranjang WHERE user_id=?', [req.uidPerson]); 
+  
+     const order = await conn.query('INSERT INTO orderBuy (user_id, receipt, amount) SELECT user_id, receipt, amount From keranjang WHERE user_id=?', [ req.uidPerson ]);
+
+    //  const detailOrder = await conn.query('INSERT INTO orderDetails ( product_id, quantity, price) SELECT product_id, quantity, price From keranjangdetails JOIN keranjang ON keranjang.uidKeranjang=keranjangdetails.keranjang_id WHERE keranjang.user_id=?', [ req.uidPerson ]);
+
+    //  const updatedetailOrder = await conn.query('UPDATE orderDetails SET orderBuy_id = ? WHERE uidOrderDetails = ? ', [ order[0].insertId, detailOrder[0].insertId ]);
+
+     const detailOder1 = await conn.query('SELECT keranjangdetails.product_id, keranjangdetails.quantity, keranjangdetails.price FROM keranjangdetails JOIN keranjang ON keranjang.uidKeranjang=keranjangdetails.keranjang_id WHERE keranjang.user_id=?' , [ req.uidPerson ]);
+
+     console.log(detailOder1[0]);
+
+     detailOder1[0].forEach(e => {
+        conn.query('INSERT INTO orderDetails (orderBuy_id, product_id, quantity, price) VALUES (?,?,?,?)', [order[0].insertId, e.product_id, e.quantity, e.price]);
+        conn.query('UPDATE products SET stock = stock-? WHERE uidProduct = ?', [ e.quantity, e.product_id ]);
+
+        console.log(e.product_id.toString()); 
+    });
+
+    const deleteKeranjangDetails = await conn.query('DELETE FROM keranjangdetails WHERE keranjang_id=?', [keranjang[0][0].uidKeranjang]);
+    const deleteKeranjang = await conn.query('DELETE FROM keranjang WHERE uidKeranjang=?', [keranjang[0][0].uidKeranjang]);
+
+ 
+    //  console.log(req.uidPerson); 
+ 
+     // await conn.end();
+ 
+     return res.json({
+         resp: true,
+         message: 'Products save'
+     });
+ 
+ 
+    } catch (err) {
+     return res.status(500).json({
+         resp: false,
+         message: err
+     });
+    }
+ }
+
 const saveOrderBuyProducts2 = async (req = request, res = response) => {
 
     try {
@@ -40,12 +89,17 @@ const saveOrderBuyProducts2 = async (req = request, res = response) => {
     //  const { picture  } = req.body;
  
      const conn = await connet();
+
+     const order = await conn.query('SELECT uidOrderBuy FROM orderBuy WHERE user_id=?', [req.uidPerson]); 
+
   
     //  await conn.query('INSERT INTO orderBuy (user_id, picture) VALUES (?,?)', 
     //         [ req.uidPerson, req.file.filename ]);
+    
+    // console.log(req.params.uidOrderBuy); 
 
     await conn.query('UPDATE orderBuy SET picture = ? WHERE uidOrderBuy = ?', 
-            [ req.file.filename, req.uidOrder ]);
+            [ req.file.filename, order[0][0].uidOrderBuy.toString() ]);
 
         await conn.end();   
 
@@ -172,6 +226,7 @@ const updateStatusPembayaran = async (req = request, res = response) => {
 
 module.exports = {
     saveOrderBuyProducts,
+    saveOrderBuyProducts1,
     saveOrderBuyProducts2,
     getAllPurchasedProducts,
     getOrderDetailsProducts,
