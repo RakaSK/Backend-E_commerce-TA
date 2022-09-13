@@ -86,7 +86,7 @@ const saveOrderBuyProducts2 = async (req = request, res = response) => {
 
     try {
         
-    //  const { picture  } = req.body;
+     const { uidOrder  } = req.body;
  
      const conn = await connet();
 
@@ -99,7 +99,7 @@ const saveOrderBuyProducts2 = async (req = request, res = response) => {
     // console.log(req.params.uidOrderBuy); 
 
     await conn.query('UPDATE orderBuy SET picture = ? WHERE uidOrderBuy = ?', 
-            [ req.file.filename, order[0][0].uidOrderBuy.toString() ]);
+            [ req.file.filename, uidOrder ]);
 
         await conn.end();   
 
@@ -176,14 +176,21 @@ const getOrderDetailsProducts = async ( req, res = response ) => {
 
         const conn = await connet();
 
-        const orderDetails = await conn.query(`CALL SP_ORDER_DETAILS(?);`, [req.params.uidOrder]);
+        // const orderDetails = await conn.query(`CALL SP_ORDER_DETAILS(?);`, [req.params.uidOrder]);
+
+        const orderDetails = await conn.query(`SELECT o.uidOrderDetails, o.orderBuy_id, orderBuy.picture as bukti_pembayaran, o.product_id, p.nameProduct, p.picture, o.quantity, o.price  FROM orderdetails o
+        INNER JOIN products p ON o.product_id = p.uidProduct
+        RIGHT JOIN orderBuy ON orderBuy.uidOrderBuy = o.orderBuy_id 
+        WHERE o.orderBuy_id = ?`, [req.params.uidOrder]);
+
 
         await conn.end();
 
         res.json({
             resp: true,
             msg : 'Get Puchased Products',
-            orderDetails : orderDetails[0][0],
+            bukti_pembayaran : orderDetails[0][0].bukti_pembayaran,
+            orderDetails : orderDetails[0],
         });
         
     } catch (err) {

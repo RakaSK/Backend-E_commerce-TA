@@ -92,7 +92,7 @@ END//
 DELIMITER //
 CREATE PROCEDURE SP_ORDER_DETAILS( IN ID INT )
 BEGIN
-	SELECT o.uidOrderDetails, o.product_id, p.nameProduct, p.picture, o.quantity, o.price  FROM orderdetails o
+	SELECT o.uidOrderDetails, o.orderBuy_id, o.product_id, p.nameProduct, p.picture, o.quantity, o.price  FROM orderdetails o
 	INNER JOIN products p ON o.product_id = p.uidProduct
 	WHERE o.orderBuy_id = ID;
 END//

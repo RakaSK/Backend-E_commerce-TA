@@ -74,7 +74,7 @@ CREATE TABLE orderBuy
 	receipt VARCHAR(100),
 	created_at DATETIME DEFAULT NOW(),
 	amount DOUBLE(11,2),
-	picture VARCHAR(256) NULL,
+	picture VARCHAR(256) DEFAULT '',
 	status VARCHAR(80) DEFAULT '0',
 	FOREIGN KEY(user_id) REFERENCES users(persona_id)
 );
