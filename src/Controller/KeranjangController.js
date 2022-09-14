@@ -125,6 +125,14 @@ const saveHistoryKeranjang = async (req = request, res = response) => {
          conn.query('UPDATE keranjang SET amount = ? WHERE uidKeranjang = ?',[jumlah, existsKeranjang[0][0].uidKeranjang.toString()] );
      });
     }
+
+    // const cekkeranjangdetails = conn.query("SELECT uidKeranjangDetails FROM keranjangdetails WHERE product_id=?", [e.uidProduct]);
+    //      if(cekkeranjangdetails[0].length === 0) {
+    //         const db = conn.query('INSERT INTO keranjangdetails (keranjang_id, product_id, quantity, price) VALUES (?,?,?,?)', [existsKeranjang[0][0].uidKeranjang, e.uidProduct, e.amount, e.price]);
+
+    //      } else {
+    //         const updatekeranjangdetails = conn.query("UPDATE keranjangdetails SET quantity = quantity+1 WHERE product_id=?", [e.uidProduct]);
+    //      }
   
     //  const db = await conn.query('INSERT INTO keranjang (user_id, receipt, amount) VALUES (?,?,?)', [ req.uidPerson, receipt, amount ]);
        

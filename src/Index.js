@@ -1,8 +1,9 @@
 
 const app = require('./app');
+const port = process.env.PORT || 7070; 
 
 
-app.get("/", (req, res)=> res.send("Koneksi Anda Berhasil !!"))
+app.get("/api", (req, res)=> res.send("Koneksi Anda Berhasil !!"))
 
 
-app.listen( process.env.PORT, () => console.log('Listen on port ' + process.env.PORT) );
+app.listen( port, () => console.log('Listen on port ' + process.env.PORT) );

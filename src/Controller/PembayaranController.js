@@ -37,13 +37,17 @@ const saveOrderBuyProducts1 = async (req = request, res = response) => {
 
     try {
         
-     const { receipt, amount, products  } = req.body;
+     const { total, ongkir  } = req.body;
  
      const conn = await connet();
 
      const keranjang = await conn.query('SELECT uidKeranjang FROM keranjang WHERE user_id=?', [req.uidPerson]); 
   
+     
      const order = await conn.query('INSERT INTO orderBuy (user_id, receipt, amount) SELECT user_id, receipt, amount From keranjang WHERE user_id=?', [ req.uidPerson ]);
+     
+     const updateamount = await conn.query('UPDATE orderBuy set amount = ?, ongkir = ? WHERE uidOrderBuy=?', [total, ongkir, order[0].insertId]); 
+
 
     //  const detailOrder = await conn.query('INSERT INTO orderDetails ( product_id, quantity, price) SELECT product_id, quantity, price From keranjangdetails JOIN keranjang ON keranjang.uidKeranjang=keranjangdetails.keranjang_id WHERE keranjang.user_id=?', [ req.uidPerson ]);
 
