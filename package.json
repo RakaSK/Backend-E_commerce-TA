@@ -1,11 +1,11 @@
 {
-  "name": "ecommerce",
+  "name": "backend",
   "version": "1.0.0",
   "description": "Flutter - Nodejs - Mysql | E-Commers API",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/index.js",
-    "start": "nodemon src/index.js"
+    "dev": "nodemon ./src/Index.js",
+    "start": "nodemon ./src/Index.js"
   },
   "author": "Raka SK",
   "license": "ISC",
