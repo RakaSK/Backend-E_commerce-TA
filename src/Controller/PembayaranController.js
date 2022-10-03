@@ -37,7 +37,7 @@ const saveOrderBuyProducts1 = async (req = request, res = response) => {
 
     try {
         
-     const { total, ongkir  } = req.body;
+     const { total, ongkir, kota_tujuan, estimasi  } = req.body;
  
      const conn = await connet();
 
@@ -46,7 +46,7 @@ const saveOrderBuyProducts1 = async (req = request, res = response) => {
      
      const order = await conn.query('INSERT INTO orderBuy (user_id, receipt, amount) SELECT user_id, receipt, amount From keranjang WHERE user_id=?', [ req.uidPerson ]);
      
-     const updateamount = await conn.query('UPDATE orderBuy set amount = ?, ongkir = ? WHERE uidOrderBuy=?', [total, ongkir, order[0].insertId]); 
+     const updateamount = await conn.query('UPDATE orderBuy set amount = ?, ongkir = ?, kota_tujuan = ?, estimasi = ? WHERE uidOrderBuy=?', [total, ongkir, kota_tujuan, estimasi, order[0].insertId]); 
 
 
     //  const detailOrder = await conn.query('INSERT INTO orderDetails ( product_id, quantity, price) SELECT product_id, quantity, price From keranjangdetails JOIN keranjang ON keranjang.uidKeranjang=keranjangdetails.keranjang_id WHERE keranjang.user_id=?', [ req.uidPerson ]);
@@ -131,7 +131,7 @@ const getAllPurchasedProductsAdmin = async ( req, res = response ) => {
 
         // const orderbuy = await conn.query('SELECT * FROM orderBuy JOIN users on orderbuy.user_id = users.id WHERE user_id = ?' [ req.uidPerson ]);
 
-        const orderbuy = await conn.query('SELECT * FROM orderBuy JOIN users on orderbuy.user_id = users.id');
+        const orderbuy = await conn.query('SELECT * FROM orderBuy JOIN users on orderbuy.user_id = users.persona_id JOIN person on orderbuy.user_id = person.uid');
 
         await conn.end();
 
@@ -158,15 +158,32 @@ const getAllPurchasedProducts = async ( req, res = response ) => {
 
         // const orderbuy = await conn.query('SELECT * FROM orderBuy JOIN users on orderbuy.user_id = users.id WHERE user_id = ?' [ req.uidPerson ]);
 
-        const orderbuy = await conn.query('SELECT * FROM orderBuy JOIN users on orderbuy.user_id = users.id WHERE users.token = ?' , [token]);
+        const orderbuy = await conn.query('SELECT * FROM orderBuy JOIN users on orderbuy.user_id = users.id JOIN person on orderbuy.user_id = person.uid WHERE users.token = ?' , [token]);
 
         await conn.end();
 
-        res.json({
-            resp: true,
-            msg : 'Get Puchased Products',
-            orderBuy : orderbuy[0],
-        });
+        // res.json({
+        //     resp: true,
+        //     msg : 'Get Puchased Products',
+        //     orderBuy : orderbuy[0],
+        // });
+
+        if(orderbuy[0].length === 0 ){
+            res.json({
+                resp: false,
+                msg : 'History belanja kosong',
+                // amount : 0,
+                orderBuy : []
+            });
+            
+        }else{
+            res.json({
+                resp: true,
+                msg : 'Get Puchased Products',
+                // amount : orderbuy[0][0].amount,
+                orderBuy : orderbuy[0]
+            });
+        }
         
     } catch (err) {
         

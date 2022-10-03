@@ -278,7 +278,7 @@ const getAllKeranjang = async ( req, res = response ) => {
    
 }
 
-const getKeranjang = async ( req, res = response ) => {
+const getKeranjangHarga = async ( req, res = response ) => {
 
 
     const { token } = req.body;
@@ -442,7 +442,7 @@ module.exports = {
     saveHistoryKeranjang,
     deleteHistoryKeranjang,
     getAllKeranjang,
-    getKeranjang,
+    getKeranjangHarga,
     getKeranjangDetails, 
     changeItemKeranjang
 }
