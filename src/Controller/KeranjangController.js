@@ -296,6 +296,8 @@ const getKeranjangHarga = async ( req, res = response ) => {
 
         const keranjang = await conn.query('SELECT keranjang.* , keranjangdetails.* , products.nameProduct , products.picture FROM keranjang JOIN users on keranjang.user_id = users.id JOIN keranjangdetails on keranjang.uidKeranjang = keranjangdetails.keranjang_id JOIN products on products.uidProduct = keranjangdetails.product_id WHERE users.token = ?' , [token]);
 
+        const jumlahquantity = await conn.query('SELECT SUM(quantity) as jumlah FROM keranjang JOIN users on keranjang.user_id = users.id JOIN keranjangdetails on keranjang.uidKeranjang = keranjangdetails.keranjang_id JOIN products on products.uidProduct = keranjangdetails.product_id WHERE users.token = ?' , [token]);
+
         await conn.end();
 
         if(keranjang[0].length === 0 ){
@@ -303,6 +305,7 @@ const getKeranjangHarga = async ( req, res = response ) => {
                 resp: false,
                 msg : 'Keranjang kosong',
                 amount : 0,
+                jumlahquantity : 0,
                 keranjang : []
             });
             
@@ -311,6 +314,7 @@ const getKeranjangHarga = async ( req, res = response ) => {
                 resp: true,
                 msg : 'Get Puchased Products',
                 amount : keranjang[0][0].amount,
+                jumlahquantity : jumlahquantity[0][0].jumlah,
                 uidKeranjang : keranjang[0][0].uidKeranjang
             });
         }

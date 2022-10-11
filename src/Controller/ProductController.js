@@ -9,7 +9,7 @@ const getProductsForHomeCarousel = async ( req = request, res = response ) => {
 
         const conn = await connet();
 
-        const rows = await conn.query('SELECT * FROM Home_carousel');
+        const rows = await conn.query('SELECT * FROM home_carousel');
 
         await conn.end();
 
@@ -103,11 +103,27 @@ const productFavoriteForUser = async (req = request, res = response) => {
 
         await conn.end();
 
-        res.json({
-            resp: true,
-            message : 'List to products favorites',
-            listProducts: listProducts[0][0]
-        });
+        if(listProducts[0][0].length === 0 ){
+            res.json({
+                resp: false,
+                message : 'Favorite kosong',
+                // amount : 0,
+                listProducts : []
+            });
+            
+        }else{
+            res.json({
+                resp: true,
+                message : 'List to products favorites',
+                listProducts: listProducts[0][0]
+            });
+        }
+
+        // res.json({
+        //     resp: true,
+        //     message : 'List to products favorites',
+        //     listProducts: listProducts[0][0]
+        // });
         
     } catch (err) {
         return res.status(500).json({
@@ -210,7 +226,7 @@ const addNewProduct = async (req = request, res = response) => {
 
         const conn = await connet();
 
-        await conn.query('INSERT INTO Products (nameProduct, description, codeProduct, stock, price, picture, category_id) VALUE (?,?,?,?,?,?,?)', 
+        await conn.query('INSERT INTO products (nameProduct, description, codeProduct, stock, price, picture, category_id) VALUE (?,?,?,?,?,?,?)', 
             [ name, description, '000' + name, stock, price, req.file.filename, uidCategory ]);
 
         await conn.end();   

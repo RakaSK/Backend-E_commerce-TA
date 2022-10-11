@@ -7,7 +7,7 @@ const getAllCategories = async ( req = request, res = response ) => {
 
         const conn = await connet();
 
-        const categories = await conn.query('SELECT * FROM Category');
+        const categories = await conn.query('SELECT * FROM category');
 
         await conn.end();
 
@@ -34,7 +34,7 @@ const addNewCategory = async (req = request, res = response) => {
 
         const conn = await connet();
 
-        await conn.query('INSERT INTO Category (category, picture) VALUE (?,?)', 
+        await conn.query('INSERT INTO category (category, picture) VALUE (?,?)', 
             [ name, req.file.filename]);
 
         await conn.end();   

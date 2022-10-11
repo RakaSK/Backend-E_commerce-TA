@@ -13,7 +13,7 @@ const LoginUsuario = async ( req = request, res = response ) => {
 
         const conn = await connet();
 
-        const existsEmail = await conn.query('SELECT id, email, passwordd FROM users WHERE email = ? LIMIT 1', [ email ]);
+        const existsEmail = await conn.query('SELECT role, id, email, passwordd FROM users WHERE email = ? LIMIT 1', [ email ]);
 
 
         if( existsEmail[0].length === 0 ){
@@ -44,7 +44,8 @@ const LoginUsuario = async ( req = request, res = response ) => {
         return res.json({
             resp: true,
             message : 'Welcome to DNI Shop',
-            token: token
+            token: token,
+            role: existsEmail[0][0].role
         });
 
         

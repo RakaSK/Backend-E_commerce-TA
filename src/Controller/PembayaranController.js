@@ -10,10 +10,10 @@ const saveOrderBuyProducts = async (req = request, res = response) => {
 
     const conn = await connet();
  
-    const db = await conn.query('INSERT INTO orderBuy (user_id, receipt, amount) VALUES (?,?,?)', [ req.uidPerson, receipt, amount ]);
+    const db = await conn.query('INSERT INTO orderbuy (user_id, receipt, amount) VALUES (?,?,?)', [ req.uidPerson, receipt, amount ]);
 
     products.forEach(e => {
-        conn.query('INSERT INTO orderDetails (orderBuy_id, product_id, quantity, price) VALUES (?,?,?,?)', [db[0].insertId, e.uidProduct, e.amount, e.price]);
+        conn.query('INSERT INTO orderdetails (orderBuy_id, product_id, quantity, price) VALUES (?,?,?,?)', [db[0].insertId, e.uidProduct, e.amount, e.price]);
         conn.query('UPDATE products SET stock = stock-? WHERE uidProduct = ?', [ e.amount, e.uidProduct ]);
     });
 
@@ -37,16 +37,16 @@ const saveOrderBuyProducts1 = async (req = request, res = response) => {
 
     try {
         
-     const { total, ongkir, kota_tujuan, estimasi  } = req.body;
+     const { total, ongkir, kota_tujuan, estimasi, namakurir  } = req.body;
  
      const conn = await connet();
 
      const keranjang = await conn.query('SELECT uidKeranjang FROM keranjang WHERE user_id=?', [req.uidPerson]); 
   
      
-     const order = await conn.query('INSERT INTO orderBuy (user_id, receipt, amount) SELECT user_id, receipt, amount From keranjang WHERE user_id=?', [ req.uidPerson ]);
+     const order = await conn.query('INSERT INTO orderbuy (user_id, receipt, amount) SELECT user_id, receipt, amount From keranjang WHERE user_id=?', [ req.uidPerson ]);
      
-     const updateamount = await conn.query('UPDATE orderBuy set amount = ?, ongkir = ?, kota_tujuan = ?, estimasi = ? WHERE uidOrderBuy=?', [total, ongkir, kota_tujuan, estimasi, order[0].insertId]); 
+     const updateamount = await conn.query('UPDATE orderbuy set amount = ?, ongkir = ?, kota_tujuan = ?, estimasi = ?, namakurir = ? WHERE uidOrderBuy=?', [total, ongkir, kota_tujuan, estimasi, namakurir, order[0].insertId]); 
 
 
     //  const detailOrder = await conn.query('INSERT INTO orderDetails ( product_id, quantity, price) SELECT product_id, quantity, price From keranjangdetails JOIN keranjang ON keranjang.uidKeranjang=keranjangdetails.keranjang_id WHERE keranjang.user_id=?', [ req.uidPerson ]);
@@ -58,7 +58,7 @@ const saveOrderBuyProducts1 = async (req = request, res = response) => {
      console.log(detailOder1[0]);
 
      detailOder1[0].forEach(e => {
-        conn.query('INSERT INTO orderDetails (orderBuy_id, product_id, quantity, price) VALUES (?,?,?,?)', [order[0].insertId, e.product_id, e.quantity, e.price]);
+        conn.query('INSERT INTO orderdetails (orderBuy_id, product_id, quantity, price) VALUES (?,?,?,?)', [order[0].insertId, e.product_id, e.quantity, e.price]);
         conn.query('UPDATE products SET stock = stock-? WHERE uidProduct = ?', [ e.quantity, e.product_id ]);
 
         console.log(e.product_id.toString()); 
@@ -94,7 +94,7 @@ const saveOrderBuyProducts2 = async (req = request, res = response) => {
  
      const conn = await connet();
 
-     const order = await conn.query('SELECT uidOrderBuy FROM orderBuy WHERE user_id=?', [req.uidPerson]); 
+     const order = await conn.query('SELECT uidOrderBuy FROM orderbuy WHERE user_id=?', [req.uidPerson]); 
 
   
     //  await conn.query('INSERT INTO orderBuy (user_id, picture) VALUES (?,?)', 
@@ -102,7 +102,7 @@ const saveOrderBuyProducts2 = async (req = request, res = response) => {
     
     // console.log(req.params.uidOrderBuy); 
 
-    await conn.query('UPDATE orderBuy SET picture = ? WHERE uidOrderBuy = ?', 
+    await conn.query('UPDATE orderbuy SET picture = ? WHERE uidOrderBuy = ?', 
             [ req.file.filename, uidOrder ]);
 
         await conn.end();   
@@ -118,7 +118,34 @@ const saveOrderBuyProducts2 = async (req = request, res = response) => {
             message: err
         });
     }
- }
+}
+
+const deleteBuktiBayar = async (req = request, res = response) => {
+
+    try {
+
+        const { uidOrder  } = req.body;
+ 
+        const conn = await connet();
+
+        await conn.query('UPDATE orderbuy SET picture = "" WHERE uidOrderBuy = ?', [ uidOrder ]);
+
+        await conn.end();   
+
+
+        return res.json({
+            resp: true,
+            message: 'Product Deleted'
+        });
+        
+    } catch (err) {
+        return res.status(500).json({
+            resp: false,
+            message: err
+        });
+    }
+
+}
 
 
 const getAllPurchasedProductsAdmin = async ( req, res = response ) => {
@@ -131,7 +158,7 @@ const getAllPurchasedProductsAdmin = async ( req, res = response ) => {
 
         // const orderbuy = await conn.query('SELECT * FROM orderBuy JOIN users on orderbuy.user_id = users.id WHERE user_id = ?' [ req.uidPerson ]);
 
-        const orderbuy = await conn.query('SELECT * FROM orderBuy JOIN users on orderbuy.user_id = users.persona_id JOIN person on orderbuy.user_id = person.uid');
+        const orderbuy = await conn.query('SELECT * FROM orderbuy JOIN users on orderbuy.user_id = users.persona_id JOIN person on orderbuy.user_id = person.uid');
 
         await conn.end();
 
@@ -158,7 +185,7 @@ const getAllPurchasedProducts = async ( req, res = response ) => {
 
         // const orderbuy = await conn.query('SELECT * FROM orderBuy JOIN users on orderbuy.user_id = users.id WHERE user_id = ?' [ req.uidPerson ]);
 
-        const orderbuy = await conn.query('SELECT * FROM orderBuy JOIN users on orderbuy.user_id = users.id JOIN person on orderbuy.user_id = person.uid WHERE users.token = ?' , [token]);
+        const orderbuy = await conn.query('SELECT * FROM orderbuy JOIN users on orderbuy.user_id = users.id JOIN person on orderbuy.user_id = person.uid WHERE users.token = ?' , [token]);
 
         await conn.end();
 
@@ -229,7 +256,7 @@ const updateStatusPembayaran = async (req = request, res = response) => {
 
         const { status, uidOrderBuy } = req.body;
 
-        await conn.query('UPDATE orderBuy SET status = ? WHERE uidOrderBuy = ?', [ parseInt(status), parseInt(uidOrderBuy) ]);
+        await conn.query('UPDATE orderbuy SET status = ? WHERE uidOrderBuy = ?', [ parseInt(status), parseInt(uidOrderBuy) ]);
 
         // await conn.query('UPDATE orderBuy SET status = ? WHERE uidOrderBuy = ?', [ req.status, req.uidOrderBuy ]);
 
@@ -256,6 +283,7 @@ module.exports = {
     saveOrderBuyProducts,
     saveOrderBuyProducts1,
     saveOrderBuyProducts2,
+    deleteBuktiBayar,
     getAllPurchasedProducts,
     getOrderDetailsProducts,
     getAllPurchasedProductsAdmin, 
