@@ -37,7 +37,7 @@ const saveOrderBuyProducts1 = async (req = request, res = response) => {
 
     try {
         
-     const { total, ongkir, kota_tujuan, estimasi, namakurir  } = req.body;
+     const { total, ongkir, kota_tujuan, estimasi, layanankirim, namakurir  } = req.body;
  
      const conn = await connet();
 
@@ -46,7 +46,7 @@ const saveOrderBuyProducts1 = async (req = request, res = response) => {
      
      const order = await conn.query('INSERT INTO orderbuy (user_id, receipt, amount) SELECT user_id, receipt, amount From keranjang WHERE user_id=?', [ req.uidPerson ]);
      
-     const updateamount = await conn.query('UPDATE orderbuy set amount = ?, ongkir = ?, kota_tujuan = ?, estimasi = ?, namakurir = ? WHERE uidOrderBuy=?', [total, ongkir, kota_tujuan, estimasi, namakurir, order[0].insertId]); 
+     const updateamount = await conn.query('UPDATE orderbuy set amount = ?, ongkir = ?, kota_tujuan = ?, estimasi = ?, layanankirim = ?, namakurir = ? WHERE uidOrderBuy=?', [total, ongkir, kota_tujuan, estimasi, layanankirim, namakurir, order[0].insertId]); 
 
 
     //  const detailOrder = await conn.query('INSERT INTO orderDetails ( product_id, quantity, price) SELECT product_id, quantity, price From keranjangdetails JOIN keranjang ON keranjang.uidKeranjang=keranjangdetails.keranjang_id WHERE keranjang.user_id=?', [ req.uidPerson ]);
@@ -226,7 +226,7 @@ const getOrderDetailsProducts = async ( req, res = response ) => {
 
         // const orderDetails = await conn.query(`CALL SP_ORDER_DETAILS(?);`, [req.params.uidOrder]);
 
-        const orderDetails = await conn.query(`SELECT o.uidOrderDetails, o.orderBuy_id, orderBuy.picture as bukti_pembayaran, o.product_id, p.nameProduct, p.picture, o.quantity, o.price  FROM orderdetails o
+        const orderDetails = await conn.query(`SELECT o.uidOrderDetails, o.orderBuy_id, orderBuy.picture as bukti_pembayaran, o.product_id, p.nameProduct, p.picture, o.quantity, o.price, p.price as priceawal FROM orderdetails o
         INNER JOIN products p ON o.product_id = p.uidProduct
         RIGHT JOIN orderBuy ON orderBuy.uidOrderBuy = o.orderBuy_id 
         WHERE o.orderBuy_id = ?`, [req.params.uidOrder]);

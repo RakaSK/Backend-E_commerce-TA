@@ -251,7 +251,7 @@ const getAllKeranjang = async ( req, res = response ) => {
         // const keranjang = await conn.query('SELECT keranjang.* FROM keranjang JOIN users on keranjang.user_id = users.id WHERE users.token = ?' , [token]);
 
 
-        const keranjang = await conn.query('SELECT keranjang.* , keranjangdetails.* , products.nameProduct , products.picture FROM keranjang JOIN users on keranjang.user_id = users.id JOIN keranjangdetails on keranjang.uidKeranjang = keranjangdetails.keranjang_id JOIN products on products.uidProduct = keranjangdetails.product_id WHERE users.token = ?' , [token]);
+        const keranjang = await conn.query('SELECT keranjang.* , keranjangdetails.* , products.nameProduct , products.picture , products.price as priceawal FROM keranjang JOIN users on keranjang.user_id = users.id JOIN keranjangdetails on keranjang.uidKeranjang = keranjangdetails.keranjang_id JOIN products on products.uidProduct = keranjangdetails.product_id WHERE users.token = ?' , [token]);
 
         await conn.end();
 
