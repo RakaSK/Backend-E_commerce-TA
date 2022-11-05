@@ -59,7 +59,7 @@ const saveOrderBuyProducts1 = async (req = request, res = response) => {
 
      detailOder1[0].forEach(e => {
         conn.query('INSERT INTO orderdetails (orderBuy_id, product_id, quantity, price) VALUES (?,?,?,?)', [order[0].insertId, e.product_id, e.quantity, e.price]);
-        conn.query('UPDATE products SET stock = stock-? WHERE uidProduct = ?', [ e.quantity, e.product_id ]);
+        // conn.query('UPDATE products SET stock = stock-? WHERE uidProduct = ?', [ e.quantity, e.product_id ]);
 
         console.log(e.product_id.toString()); 
     });
@@ -84,7 +84,8 @@ const saveOrderBuyProducts1 = async (req = request, res = response) => {
          message: err
      });
     }
- }
+}
+
 
 const saveOrderBuyProducts2 = async (req = request, res = response) => {
 
@@ -252,15 +253,28 @@ const updateStatusPembayaran = async (req = request, res = response) => {
 
     try {
 
+        const { status, uidOrderBuy } = req.body;
+        
         const conn = await connet();
 
-        const { status, uidOrderBuy } = req.body;
 
         await conn.query('UPDATE orderbuy SET status = ? WHERE uidOrderBuy = ?', [ parseInt(status), parseInt(uidOrderBuy) ]);
 
-        // await conn.query('UPDATE orderBuy SET status = ? WHERE uidOrderBuy = ?', [ req.status, req.uidOrderBuy ]);
 
-        await conn.end();   
+        console.log(uidOrderBuy); 
+
+        const detailOder1 = await conn.query('SELECT orderdetails.product_id, orderdetails.quantity, orderdetails.price FROM orderdetails JOIN orderbuy ON orderbuy.uidOrderBuy=orderdetails.orderBuy_id WHERE orderbuy.uidOrderBuy=?' , [ uidOrderBuy ]);
+
+        console.log(detailOder1[0]);
+
+        detailOder1[0].forEach(e => {
+            
+            conn.query('UPDATE products SET stock = stock-? WHERE uidProduct = ?', [ e.quantity, e.product_id ]);
+
+            console.log(e.product_id.toString()); 
+            console.log(e.quantity.toString()); 
+            
+        }); 
 
         return res.json({
             resp: true,
