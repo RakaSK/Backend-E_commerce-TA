@@ -40,12 +40,17 @@ const addNewUser = async (req = request, res = response) => {
 const getUserById = async (req = request, res = response ) => {
 
     try {
+        const { token } = req.body;
 
         const conn = await connect();
 
         const userdb = await conn.query(`CALL SP_GET_USER_BY_ID(?);`, [ req.uidPerson ]);
+        // const userdb = await conn.query(`SELECT pe.uid, pe.firstName, pe.lastName, pe.phone, pe.address, pe.reference, pe.image, us.users, us.email 
+        // FROM person pe
+        // INNER JOIN users us ON pe.uid = us.persona_id
+        // WHERE us.token = ?`, [ token ]);
 
-        conn.end();
+        // conn.end();
 
         return res.json({
             resp: true,
